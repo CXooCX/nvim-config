@@ -282,7 +282,7 @@ Runner.config = {
     if vim.fn.filereadable(file_path) == 0 then return false end
 
     -- Read first 50 lines to save performance
-    local content = vim.fn.readfile(file_path, "", 50)
+    local content = vim.api.nvim_buf_get_lines(0, 0, 50, false)
     for _, line in ipairs(content) do
       -- Check for require("ffi") or require 'ffi'
       if line:match("require%s*%(?['\"]ffi['\"]%)?") then
@@ -435,7 +435,7 @@ Runner.config = {
     elseif ft == "lua" and mode == "run" then
       if detect_luajit() then
         -- Switch mode to 'jit' defined in step 1
-        mode = "jit"
+        mode = "luajit"
         -- Optional: Change name for the header UI
         Runner.config.commands.lua.name = "LuaJIT"
       else
