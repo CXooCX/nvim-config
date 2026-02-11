@@ -304,6 +304,54 @@ return {
         color = { fg = mocha.sky },
       }
 
+      -- Runner Mode HUD: shows current Runner target/mode in the statusline
+      local runner_mode = {
+        function()
+          if not _G.Runner or not _G.Runner.state or not _G.Runner.state.last_mode then
+            return ""
+          end
+          local mode = _G.Runner.state.last_mode
+          local icon
+          if mode:match("win32") or mode:match("dll") then
+            icon = " "
+          elseif mode == "asm_bin" or mode:match("shellcode") then
+            icon = "💣 "
+          elseif mode == "hex" then
+            icon = "01 "
+          else
+            icon = " "
+          end
+          return icon .. mode
+        end,
+        cond = function()
+          return _G.Runner ~= nil
+            and _G.Runner.state ~= nil
+            and _G.Runner.state.last_mode ~= nil
+        end,
+        color = { fg = mocha.red, gui = "bold" },
+      }
+      -- Custom Runner Status Component
+      local runner_status = {
+        function()
+          if not _G.Runner or not _G.Runner.state or not _G.Runner.state.last_mode then
+            return ""
+          end
+          
+          local mode = _G.Runner.state.last_mode
+          local icon = " " -- Default gear
+          
+          if mode:match("win32") or mode:match("dll") then
+            icon = " " -- Windows icon for cross-compile
+          elseif mode:match("asm_bin") or mode:match("shellcode") then
+            icon = " " -- Terminal/Shell for shellcode
+          elseif mode:match("hex") then
+            icon = " " -- Binary/Hex icon
+          end
+          
+          return icon .. mode:upper()
+        end,
+        color = { fg = mocha.red, gui = "bold" },
+      }
       require("lualine").setup({
         options = {
           theme = "catppuccin",
@@ -321,12 +369,13 @@ return {
             { "branch", icon = "", color = { fg = mocha.pink, gui = "bold" } },
             diff,
           },
-          lualine_c = { filetype_icon, filename, diagnostics },
-          lualine_x = { lsp_info, "encoding" },
+          lualine_c = { filetype_icon, filename, diagnostics, runner_mode },
+          lualine_x = { runner_status, lsp_info, "encoding" },
           lualine_y = {
             { "progress", color = { fg = mocha.peach } },
           },
           lualine_z = { location, clock },
+
         },
         inactive_sections = {
           lualine_a = {},

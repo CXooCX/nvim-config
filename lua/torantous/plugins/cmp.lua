@@ -19,6 +19,8 @@ return {
       local luasnip = require("luasnip")
       local lspkind = require("lspkind")
       require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip.loaders.from_lua").lazy_load({ paths = { vim.fn.stdpath("config") .. "/lua/torantous/snippets" } })
+      require("luasnip").add_snippets("cpp", require("torantous.snippets.cpp"))
 
       cmp.setup({
         snippet = { expand = function(args) luasnip.lsp_expand(args.body) end },
